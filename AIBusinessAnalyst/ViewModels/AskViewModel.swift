@@ -4,6 +4,7 @@
 //
 //  Created by Rodrigo Ferrarezi Figueiredo de Lima on 28/06/26.
 //
+
 import Foundation
 import Combine
 
@@ -21,6 +22,10 @@ final class AskViewModel: ObservableObject {
         "Qual foi o ticket médio?",
         "Qual foi o produto mais vendido?"
     ]
+
+    var canAskQuestion: Bool {
+        question.trimmingCharacters(in: .whitespacesAndNewlines).count >= 3 && !isLoading
+    }
 
     private let service = BusinessAnalystService()
 
@@ -49,7 +54,7 @@ final class AskViewModel: ObservableObject {
 
             history.insert(historyItem, at: 0)
         } catch {
-            errorMessage = "Não foi possível consultar a API. Verifique se o backend está rodando."
+            errorMessage = "Não foi possível consultar a API. Verifique se o backend está rodando. Detalhe: \(error.localizedDescription)"
         }
 
         isLoading = false

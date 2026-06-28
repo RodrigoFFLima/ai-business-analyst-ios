@@ -4,6 +4,7 @@
 //
 //  Created by Rodrigo Ferrarezi Figueiredo de Lima on 28/06/26.
 //
+
 import SwiftUI
 
 struct AskView: View {
@@ -14,11 +15,8 @@ struct AskView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     headerSection
-
                     questionSection
-
                     suggestedQuestionsSection
-
                     askButton
 
                     if let errorMessage = viewModel.errorMessage {
@@ -106,7 +104,7 @@ struct AskView: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderedProminent)
-        .disabled(viewModel.isLoading)
+        .disabled(!viewModel.canAskQuestion)
     }
 
     private func errorSection(_ message: String) -> some View {
