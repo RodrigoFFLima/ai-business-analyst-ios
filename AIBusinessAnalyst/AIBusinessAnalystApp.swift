@@ -11,7 +11,7 @@ import SwiftUI
 struct AIBusinessAnalystApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AskView()
         }
     }
 }
