@@ -4,7 +4,6 @@
 //
 //  Created by Rodrigo Ferrarezi Figueiredo de Lima on 28/06/26.
 //
-
 import Foundation
 import Combine
 
@@ -14,6 +13,14 @@ final class AskViewModel: ObservableObject {
     @Published var response: AskResponse?
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var history: [QuestionHistoryItem] = []
+
+    let suggestedQuestions: [String] = [
+        "Qual foi a receita total?",
+        "Quantos pedidos tivemos?",
+        "Qual foi o ticket médio?",
+        "Qual foi o produto mais vendido?"
+    ]
 
     private let service = BusinessAnalystService()
 
@@ -30,11 +37,30 @@ final class AskViewModel: ObservableObject {
         response = nil
 
         do {
-            response = try await service.ask(question: trimmedQuestion)
+            let apiResponse = try await service.ask(question: trimmedQuestion)
+            response = apiResponse
+
+            let historyItem = QuestionHistoryItem(
+                question: apiResponse.question,
+                answer: apiResponse.answer,
+                metric: apiResponse.metric,
+                confidenceScore: apiResponse.confidenceScore
+            )
+
+            history.insert(historyItem, at: 0)
         } catch {
             errorMessage = "Não foi possível consultar a API. Verifique se o backend está rodando."
         }
 
         isLoading = false
+    }
+
+    func askSuggestedQuestion(_ suggestedQuestion: String) async {
+        question = suggestedQuestion
+        await ask()
+    }
+
+    func clearHistory() {
+        history.removeAll()
     }
 }

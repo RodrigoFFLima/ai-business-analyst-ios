@@ -4,32 +4,33 @@
 //
 //  Created by Rodrigo Ferrarezi Figueiredo de Lima on 28/06/26.
 //
-
 import SwiftUI
 
 struct AskView: View {
-    @StateObject private var viewModel = AskViewModel()
+    @ObservedObject var viewModel: AskViewModel
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                headerSection
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    headerSection
 
-                questionSection
+                    questionSection
 
-                askButton
+                    suggestedQuestionsSection
 
-                if let errorMessage = viewModel.errorMessage {
-                    errorSection(errorMessage)
+                    askButton
+
+                    if let errorMessage = viewModel.errorMessage {
+                        errorSection(errorMessage)
+                    }
+
+                    if let response = viewModel.response {
+                        responseSection(response)
+                    }
                 }
-
-                if let response = viewModel.response {
-                    responseSection(response)
-                }
-
-                Spacer()
+                .padding()
             }
-            .padding()
             .navigationTitle("AI Business Analyst")
         }
     }
@@ -61,6 +62,30 @@ struct AskView: View {
                         await viewModel.ask()
                     }
                 }
+        }
+    }
+
+    private var suggestedQuestionsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Perguntas sugeridas")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(viewModel.suggestedQuestions, id: \.self) { suggestedQuestion in
+                        Button {
+                            Task {
+                                await viewModel.askSuggestedQuestion(suggestedQuestion)
+                            }
+                        } label: {
+                            Text(suggestedQuestion)
+                                .font(.subheadline)
+                                .lineLimit(1)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
         }
     }
 
@@ -132,5 +157,5 @@ struct InfoCard: View {
 }
 
 #Preview {
-    AskView()
+    AskView(viewModel: AskViewModel())
 }
